@@ -1,0 +1,4 @@
+int tab[15];
+int main(void){
+  return 0;
+}

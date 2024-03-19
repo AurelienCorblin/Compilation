@@ -1,0 +1,5 @@
+int affectation(void){
+  int a;
+  int tab[12];
+  a = tab[1];
+}

@@ -1,0 +1,5 @@
+
+int declaration2(void){
+  int b(void);
+  return 1;
+}

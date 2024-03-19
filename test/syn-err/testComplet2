@@ -1,0 +1,16 @@
+int a;
+int b, c;
+char tab[15];
+
+int main(void){
+  int sum;
+  sum = 0;
+  while(sum < 10){
+    sum = sum + 1;
+  }
+  if(a < ){
+    sum = 0;
+  }
+  return 0;
+}
+

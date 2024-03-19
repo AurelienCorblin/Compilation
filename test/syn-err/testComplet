@@ -1,0 +1,23 @@
+int a;
+char tableau1[15], c, b;
+int v, y;
+
+int main(void) {
+	int count;
+	while(1) {
+		a = a + 1;
+	}
+	if	(a ==  && (v || y)) {
+		tab[3 * 5] = f(tab[3]);
+		return 45;
+	} else{
+		a = 1;
+		b = 3;
+		return 1;
+	}
+	a = 4;
+}
+
+void d2_24(int tab[]) {
+	return ;
+}

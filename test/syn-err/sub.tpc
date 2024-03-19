@@ -1,0 +1,3 @@
+int sub(int nb1, int nb2){
+  return nb1 - ;
+}

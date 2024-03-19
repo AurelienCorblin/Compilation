@@ -1,0 +1,3 @@
+int main(int tab[]){
+  tab[2*3] = 0;
+}

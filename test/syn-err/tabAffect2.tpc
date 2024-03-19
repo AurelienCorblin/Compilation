@@ -1,0 +1,3 @@
+int affectation2(int tab[]){
+  tab[] = 3;
+}

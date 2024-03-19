@@ -1,0 +1,6 @@
+int eq(int a, int b){
+  if(!){
+    return 0;
+  }
+  return 1;
+}

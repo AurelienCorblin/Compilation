@@ -1,0 +1,4 @@
+char tab[];
+int main(void){
+  return 0;
+}

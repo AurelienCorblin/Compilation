@@ -1,0 +1,7 @@
+int main(int a){
+  int cmpt;
+  cmpt = 0;
+  while(cmpt < a){
+    cmpt = cmpt + 1;
+  }
+}

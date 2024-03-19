@@ -1,0 +1,3 @@
+int affectation(int a){
+  int b = a;
+}

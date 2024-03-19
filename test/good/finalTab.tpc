@@ -1,0 +1,3 @@
+int main(int days[]){
+  days[5] = duration[(now+span)%12];
+}
