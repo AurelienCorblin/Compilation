@@ -1,0 +1,11 @@
+void foo(void){
+    return;
+}
+
+int main(void){
+    if(foo()){
+
+    }
+    return 0;
+}
+

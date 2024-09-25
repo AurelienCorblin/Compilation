@@ -1,0 +1,16 @@
+int foo(void){
+    int foo;
+    /*
+    en c on a le droit, mais ça rend 
+    la récursivité impossible, car la 
+    variable locale 'foo' a priorité
+    sur 'foo()' donc foo() n'est pas reconnu
+    */
+    return 0;
+}
+
+int main(void){
+
+
+    return 0;
+}

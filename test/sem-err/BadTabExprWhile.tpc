@@ -1,0 +1,7 @@
+int main(void){
+    int tab[10];
+    while(tab){
+        // erreur sémantique
+    }
+    return 0;
+}

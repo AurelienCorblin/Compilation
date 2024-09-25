@@ -1,5 +1,5 @@
 int a;
-char tableau1[15], c, b;
+int tab[15], c, b;
 int v, y;
 
 int main(void) {
@@ -8,7 +8,7 @@ int main(void) {
 		a = a + 1;
 	}
 	if	(a == 2 && (v || y)) {
-		tab[3 * 5] = f(tab[3]);
+		tab[3 * 5] = d2_24(tab[3]);
 		return 45;
 	} else{
 		a = 1;
@@ -16,8 +16,9 @@ int main(void) {
 		return 1;
 	}
 	a = 4;
+	return 0;
 }
 
-void d2_24(int tab[]) {
-	return ;
+int d2_24(int val) {
+	return val;
 }

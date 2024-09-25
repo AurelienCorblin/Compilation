@@ -4,12 +4,12 @@ ok=0
 cpt=0
 
 for file in test/good/*; do
-    ./bin/tpcas < "$file"
+    ./bin/tpcc < "$file" 
     if [ $? -eq 0 ]; then
-        echo "Test passed: $file : 0"
+        echo "Test passed: $file"
         ok=$((ok + 1))
     else
-        echo "Test failed: $file : 1"
+        echo "Test failed: $file"
     fi
     cpt=$((cpt + 1))
 done
@@ -17,12 +17,38 @@ done
 echo " "
 
 for file in test/syn-err/*; do
-    ./bin/tpcas < "$file"
-    if [ $? -eq 0 ]; then
-        echo "Test failed: $file : 0"
-    else
-        echo "Test passed: $file : 1"
+    ./bin/tpcc < "$file" 2> /dev/null
+    if [ $? -eq 1 ]; then
+        echo "Test passed: $file"
         ok=$((ok + 1))
+    else
+        echo "Test failed: $file" 
+    fi
+    cpt=$((cpt + 1))
+done
+
+echo " "
+
+for file in test/sem-err/*; do
+    ./bin/tpcc < "$file" 2> /dev/null
+    if [ $? -eq 2 ]; then
+        echo "Test passed: $file"
+        ok=$((ok + 1))
+    else
+        echo "Test failed: $file" 
+    fi
+    cpt=$((cpt + 1))
+done
+
+echo " "
+
+for file in test/warn/*; do
+    ./bin/tpcc < "$file" 
+    if [ $? -eq 0 ]; then
+        echo "Test passed: $file"
+        ok=$((ok + 1))
+    else
+        echo "Test failed: $file" 
     fi
     cpt=$((cpt + 1))
 done

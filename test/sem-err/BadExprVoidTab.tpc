@@ -1,0 +1,9 @@
+void foo(void){
+    return;
+}
+
+int main(void){
+    int tab[2];
+    tab[foo()] = 1;
+    return 0;
+}

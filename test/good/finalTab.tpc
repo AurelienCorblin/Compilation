@@ -1,3 +1,5 @@
 int main(int days[]){
-  days[5] = duration[(now+span)%12];
+  int duration[10];
+  days[5] = duration[days[4] % 2];
+  return 0;
 }

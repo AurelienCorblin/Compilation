@@ -1,0 +1,7 @@
+int conv(void){
+    return 'a'; // conversion implicite en int
+}
+
+int main(void){
+    return 0;
+}

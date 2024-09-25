@@ -1,0 +1,9 @@
+int global_var;
+
+int global_var(void){
+    return 0;
+}
+
+int main(void){
+    return 0;
+}

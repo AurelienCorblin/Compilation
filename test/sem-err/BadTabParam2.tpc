@@ -1,0 +1,9 @@
+int foo(char tableau[], int param2){
+    return 1;
+}
+
+int main(void){
+    int tab[5];
+    foo(tab, 4); // erreur sémantique
+    return 0;
+}
