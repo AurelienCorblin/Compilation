@@ -1,7 +1,12 @@
 /* tree.h */
+#ifndef __TREE__
+#define __TREE__
+
+#include "symbol.h"
 
 typedef enum {
   ident,
+  ident_f,
   type_, 
   void_, 
   if_, 
@@ -13,6 +18,7 @@ typedef enum {
   eq, 
   order,
   addsub,
+  addsub_u,
   divstar,
   num,
   character,
@@ -33,6 +39,8 @@ typedef enum {
   index_,
   egale
 } label_t;
+
+
 
 union Value {
         char byte;
@@ -57,3 +65,17 @@ void printTree(Node *node);
 #define FIRSTCHILD(node) node->firstChild
 #define SECONDCHILD(node) node->firstChild->nextSibling
 #define THIRDCHILD(node) node->firstChild->nextSibling->nextSibling
+
+void fill_table(TabTabSymb *table, Node *node);
+void fill_Vars(TabSymb *table, Node *node);
+void fill_functions(TabTabSymb *table, Node *node);
+void fill_params(TabSymb *table, Node *node);
+void fill_funct_tab(TabTabSymb *table, Node *node);
+void fill_Vars_func(TabFunct *table, Node *node);
+TabTabSymb *create_full_table(Node *node);
+
+
+void print_table(TabSymb *table);
+void print_all_symb(TabTabSymb *table);
+
+#endif

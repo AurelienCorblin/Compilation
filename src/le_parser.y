@@ -1,10 +1,13 @@
 %{
 #include <stdio.h>
+#include "symbol.h"
 #include "tree.h"
+#include "trad.h"
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 int yylex();
+extern FILE *yyin;
 extern int lineno;
 extern int nbChar;
 void yyerror(char *msg);
@@ -24,7 +27,7 @@ Node* root;
 %token <num> NUM
 %token <ident> IDENT 
 %token <type> TYPE
-%token <comp> ORDER EQ
+%token <comp> ORDER EQ 
 %token OR AND IF WHILE ELSE RETURN VOID
 
 %type <node> Prog DeclVars Declarateurs ID 
@@ -205,8 +208,13 @@ SuiteInstr:
             }
             
             if($1 != NULL) {
-                addSibling(FIRSTCHILD($1), $2);
-                $$ = $1;
+                if(FIRSTCHILD($1)) {
+                    addSibling(FIRSTCHILD($1), $2);
+                    $$ = $1;
+                }else {
+                    addSibling($$, $2);
+                    $$ = $1;
+                }
             }
        }
     |
@@ -227,7 +235,11 @@ Instr:
             strcpy(v.str, "if");
             $$ = makeNode(if_, v, 2);
             addChild($$, $3);
-            addChild($$, $5);
+            if($5 == NULL) {
+                Node *tmp = makeNode(instruction, (union Value) {.num = 0}, 0);
+                addChild($$, tmp);
+                addChild(tmp, NULL);
+            }else {addChild($$, $5);}
         }
     |  IF '(' Exp ')' Instr ELSE Instr
         {
@@ -235,8 +247,16 @@ Instr:
             strcpy(v.str, "if");
             $$ = makeNode(if_, v, 2);
             addChild($$, $3);
-            addChild($$, $5);
-            addChild($$, $7);
+            if($5 == NULL) {
+                Node *tmp = makeNode(instruction, (union Value) {.num = 0}, 0);
+                addChild($$, tmp);
+                addChild(tmp, NULL);
+            }else {addChild($$, $5);}
+            if($7 == NULL) {
+                Node *tmp = makeNode(instruction, (union Value) {.num = 0}, 0);
+                addChild($$, tmp);
+                addChild(tmp, NULL);
+            }else {addChild($$, $7);}
         }
     |  WHILE '(' Exp ')' Instr
         {
@@ -244,13 +264,17 @@ Instr:
             strcpy(v.str, "while");
             $$ = makeNode(while_, v, 2);
             addChild($$, $3);
-            addChild($$, $5);
+            if($5 == NULL) {
+                Node *tmp = makeNode(instruction, (union Value) {.num = 0}, 0);
+                addChild($$, tmp);
+                addChild(tmp, NULL);
+            }else {addChild($$, $5);}
         }
     |  IDENT '(' Arguments  ')' ';'
         {
             union Value v;
             strcpy(v.str, $1);
-            $$ = makeNode(ident, v, 2);
+            $$ = makeNode(ident_f, v, 2);
             addChild($$, $3);
         }
     |  RETURN Exp ';'
@@ -349,7 +373,7 @@ T   :  T DIVSTAR F
     ;
 F   :  ADDSUB F
         {
-            $$ = makeNode(addsub, (union Value) {.byte = $1}, 1);
+            $$ = makeNode(addsub_u, (union Value) {.byte = $1}, 1);
             addChild($$, $2);
         }
     |  '!' F
@@ -377,7 +401,7 @@ F   :  ADDSUB F
         {
             union Value v;
             strcpy(v.str, $1);
-            $$ = makeNode(ident, v, 2);
+            $$ = makeNode(ident_f, v, 2);
             addChild($$, $3);
         }
     ;
@@ -426,40 +450,72 @@ ListExp:
 int main(int argc, char *argv[]) {
     int opt;
     int treeFlag = 0;
+    int symtabs = 0;
+    char nasm_name[64] = "_anonymous.asm";
 
     struct option long_options[] = {
+        {"symtabs", no_argument, 0, 's'},
         {"tree", no_argument, 0, 't'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "th", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "ths", long_options, NULL)) != -1) {
         switch (opt) {
             case 't':
                 treeFlag = 1;
                 break;
             case 'h':
-                printf("Description de l'interface utilisateur:\n");
+                printf("User interface description:\n");
                 printf("Options:\n");
-                printf("  -t, --tree  Affiche l'arbre abstrait sur la sortie standard\n");
-                printf("  -h, --help  Affiche cette aide et termine l'exécution\n");
-                printf("Usage: %s < [FILE.tpc] [-t] [-h]\n", argv[0]);
+                printf("  -t, --tree  Print the abstract tree to standard output\n");
+                printf("  -s, --symtabs  Print symbol tables to standard output\n");
+                printf("  -h, --help  Display this help and terminate execution\n");
+                printf("Use:\n%s [-t] [-h] [-s] < [FILE.tpc]\nOR\n%s [-t] [-h] [-s] [FILE.tpc]\n", argv[0], argv[0]);
                 return 0;
+            case 's':
+                symtabs = 1;
+                break;
             default:
-                fprintf(stderr, "Option invalide \n");
-                return 2;
+                fprintf(stderr, "invalid option\n");
+                return 3;
         }
     }
 
-    if(isatty(STDIN_FILENO) || optind != argc) {
-        printf("Usage: %s < [FILE.tpc] [-t] [-h]\n", argv[0]);
-        return 2;
+    if(optind < argc) {
+        yyin = fopen(argv[optind], "r");
+        if(NULL == yyin) {
+            fprintf(stderr, "ERROR : cant open the file %s\n", argv[optind]);
+            return 3;
+        }
+        int len = strlen(argv[optind]);
+        if(!strcmp(argv[optind]+len-4, ".tpc")) {
+            strncpy(nasm_name, argv[optind], len - 3);
+            nasm_name[len-3] = '\0';
+            strcat(nasm_name, "asm");
+        }else {
+            fprintf(stderr, "ERROR : expected a file like 'file_name.tpc' but got 'file_name'\n");
+            return 3;
+        }
+    }
+    if(isatty(STDIN_FILENO) && optind == argc) {
+        printf("Use:\n%s [-t] [-h] [-s] < [FILE.tpc]\nOR\n%s [-t] [-h] [-s] [FILE.tpc]\n", argv[0], argv[0]);
+        return 3;
     }
 
     if (!yyparse()) {
+
+        TabTabSymb *table = create_full_table(root);
+        traduction(table, root, nasm_name);
+
+        if(symtabs) {
+            print_all_symb(table);
+        }
         if (treeFlag) {
             printTree(root);
         }
+        deleteTree(root);
+        table_destroy(table);
         return 0;
     } else {
         return 1;
@@ -467,5 +523,5 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(char *msg) {
-    fprintf(stderr, "Erreur:l:%d,c:%d : %s\n", lineno, nbChar, msg);
+    fprintf(stderr, "l.%d c.%d : %s\n", lineno, nbChar, msg);
 }

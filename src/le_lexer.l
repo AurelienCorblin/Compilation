@@ -10,6 +10,7 @@ int nbChar = 1;
 %option nounput
 %option noinput
 %option noyywrap
+%option never-interactive
 
 %x COMMENTARY
 
@@ -40,8 +41,13 @@ while                	{nbChar += yyleng; return WHILE;}
 "+"|"-"                 {yylval.byte = yytext[0]; nbChar += yyleng; return ADDSUB;}
 "*"|"%"|"/"             {yylval.byte = yytext[0]; nbChar += yyleng; return DIVSTAR;}
 
-'\\['nt]'          		{yylval.byte = yytext[0]; return CHARACTER;}
-'.'                		{yylval.byte = yytext[0]; return CHARACTER;}
+'\\['nt]'          		{
+                        if (strcmp(yytext, "\'\\n\'") == 0) {
+                            yylval.byte = 10;
+                         }else {
+                            yylval.byte = 9;
+                         } return CHARACTER;}
+'.'                		{yylval.byte = yytext[1]; return CHARACTER;}
 
 [ \t]+              	;
 \n                  	{lineno++; nbChar = 1;}
